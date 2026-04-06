@@ -546,16 +546,16 @@ DEFAULT_CONFIG = {
     },
 
     # Safety — human-impact review based on the Burgess Principle.
-    # When enabled, the agent's system prompt includes guidance to flag changes
-    # that affect real people (accessibility, privacy, billing, automated
-    # decisions, etc.) for human review before finalizing.
+    # Enabled by default — the agent always flags changes that affect real
+    # people (accessibility, privacy, billing, automated decisions, etc.)
+    # for human review before finalizing.  Set to false to disable.
     # See: https://github.com/ljbudgie/burgess-principle
     "safety": {
-        "burgess_review": False,
+        "burgess_review": True,
     },
 
     # Config schema version - bump this when adding new required fields
-    "_config_version": 13,
+    "_config_version": 14,
 }
 
 # =============================================================================
@@ -1339,6 +1339,7 @@ _KNOWN_ROOT_KEYS = {
     "fallback_providers", "credential_pool_strategies", "toolsets",
     "agent", "terminal", "display", "compression", "delegation",
     "auxiliary", "custom_providers", "memory", "gateway",
+    "logging", "safety",
 }
 
 # Valid fields inside a custom_providers list entry
@@ -1642,6 +1643,20 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
                     for key in list(providers_dict.keys())[-migrated_count:]:
                         ep = providers_dict[key]
                         print(f"    → {key}: {ep.get('api', '')}")
+
+    # ── Version 13 → 14: enable Burgess Principle by default ──────────
+    if current_ver < 14:
+        config = load_config()
+        safety = config.get("safety", {})
+        if not isinstance(safety, dict):
+            safety = {}
+        if "burgess_review" not in safety:
+            safety["burgess_review"] = True
+            config["safety"] = safety
+            save_config(config)
+            results["config_added"].append("safety.burgess_review=true")
+            if not quiet:
+                print("  ✓ Enabled Burgess Principle human-impact review (safety.burgess_review: true)")
 
     if current_ver < latest_ver and not quiet:
         print(f"Config version: {current_ver} → {latest_ver}")

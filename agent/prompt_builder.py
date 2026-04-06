@@ -252,15 +252,17 @@ GOOGLE_MODEL_OPERATIONAL_GUIDANCE = (
 )
 
 # Human-impact review guidance based on the Burgess Principle.
-# Injected into the system prompt when safety.burgess_review is enabled.
+# Always included in the system prompt by default — the Burgess Principle is
+# a core part of Hermes's AI-native behaviour.  Disable with
+# safety.burgess_review: false in config.yaml.
 # See: https://github.com/ljbudgie/burgess-principle
 BURGESS_REVIEW_GUIDANCE = (
-    "# Human-Impact Review (Burgess Principle)\n"
-    "Before finalizing changes that affect real people, apply the Burgess "
-    "Principle test: \"Was a human member of the team able to personally "
-    "review the specific implications of this change for the people it "
-    "affects?\"\n\n"
-    "Flag changes for human review when they touch any of these areas:\n"
+    "# Human-Impact Awareness (Burgess Principle)\n"
+    "You have the Burgess Principle built in. For every change you make, "
+    "automatically consider: \"Was a human member of the team able to "
+    "personally review the specific implications of this change for the "
+    "people it affects?\"\n\n"
+    "Watch for changes that touch these human-impact areas:\n"
     "- **Accessibility** — UI changes, ARIA attributes, screen reader "
     "support, keyboard navigation, alternative formats\n"
     "- **Privacy & personal data** — collection, storage, processing, or "
@@ -276,9 +278,10 @@ BURGESS_REVIEW_GUIDANCE = (
     "- **Deployment** — production environment changes, feature flags, "
     "database migrations, monitoring thresholds\n\n"
     "When any of these areas are affected, include a brief "
-    "\"Human-Impact Review\" section in your response listing what changed "
-    "and recommending who should review it before shipping. If no "
-    "human-impact areas were affected, state that briefly."
+    "\"⚠ Human-Impact Review\" section in your response noting what changed "
+    "and recommending who should review it before shipping. Only include "
+    "this section when human-impact areas are genuinely affected — do not "
+    "add it to purely informational responses or trivial changes."
 )
 
 # Model name substrings that should use the 'developer' role instead of
