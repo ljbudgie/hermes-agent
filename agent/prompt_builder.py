@@ -251,6 +251,36 @@ GOOGLE_MODEL_OPERATIONAL_GUIDANCE = (
     "Don't stop with a plan — execute it.\n"
 )
 
+# Human-impact review guidance based on the Burgess Principle.
+# Injected into the system prompt when safety.burgess_review is enabled.
+# See: https://github.com/ljbudgie/burgess-principle
+BURGESS_REVIEW_GUIDANCE = (
+    "# Human-Impact Review (Burgess Principle)\n"
+    "Before finalizing changes that affect real people, apply the Burgess "
+    "Principle test: \"Was a human member of the team able to personally "
+    "review the specific implications of this change for the people it "
+    "affects?\"\n\n"
+    "Flag changes for human review when they touch any of these areas:\n"
+    "- **Accessibility** — UI changes, ARIA attributes, screen reader "
+    "support, keyboard navigation, alternative formats\n"
+    "- **Privacy & personal data** — collection, storage, processing, or "
+    "sharing of personal data; consent flows; analytics; tracking\n"
+    "- **Security** — authentication, authorization, credential handling, "
+    "encryption, input validation\n"
+    "- **User-facing language** — error messages, notifications, onboarding "
+    "text, terms of service references\n"
+    "- **Pricing & billing** — payment flows, subscription logic, pricing "
+    "display, currency handling, refund logic\n"
+    "- **Automated decisions** — algorithms that score, rank, filter, "
+    "recommend, approve, or deny things for real people\n"
+    "- **Deployment** — production environment changes, feature flags, "
+    "database migrations, monitoring thresholds\n\n"
+    "When any of these areas are affected, include a brief "
+    "\"Human-Impact Review\" section in your response listing what changed "
+    "and recommending who should review it before shipping. If no "
+    "human-impact areas were affected, state that briefly."
+)
+
 # Model name substrings that should use the 'developer' role instead of
 # 'system' for the system prompt.  OpenAI's newer models (GPT-5, Codex)
 # give stronger instruction-following weight to the 'developer' role.

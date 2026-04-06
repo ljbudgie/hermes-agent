@@ -129,6 +129,7 @@ COMMAND_REGISTRY: list[CommandDef] = [
     CommandDef("commands", "Browse all commands and skills (paginated)", "Info",
                gateway_only=True, args_hint="[page]"),
     CommandDef("help", "Show available commands", "Info"),
+    CommandDef("review", "Run a Burgess Principle human-impact review of the current session's changes", "Info"),
     CommandDef("usage", "Show token usage for the current session", "Info"),
     CommandDef("insights", "Show usage insights and analytics", "Info",
                args_hint="[days]"),

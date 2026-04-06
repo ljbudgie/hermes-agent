@@ -545,8 +545,17 @@ DEFAULT_CONFIG = {
         "backup_count": 3,     # Number of rotated backup files to keep
     },
 
+    # Safety — human-impact review based on the Burgess Principle.
+    # When enabled, the agent's system prompt includes guidance to flag changes
+    # that affect real people (accessibility, privacy, billing, automated
+    # decisions, etc.) for human review before finalizing.
+    # See: https://github.com/ljbudgie/burgess-principle
+    "safety": {
+        "burgess_review": False,
+    },
+
     # Config schema version - bump this when adding new required fields
-    "_config_version": 12,
+    "_config_version": 13,
 }
 
 # =============================================================================
