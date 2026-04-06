@@ -1136,13 +1136,13 @@ class AIAgent:
             _agent_section = {}
         self._tool_use_enforcement = _agent_section.get("tool_use_enforcement", "auto")
 
-        # Burgess Principle human-impact review: when enabled, the system
-        # prompt instructs the agent to flag changes that affect real people
-        # (accessibility, privacy, billing, automated decisions, etc.).
+        # Burgess Principle human-impact review: enabled by default, the
+        # system prompt instructs the agent to flag changes that affect real
+        # people (accessibility, privacy, billing, automated decisions, etc.).
         _safety_section = _agent_cfg.get("safety", {})
         if not isinstance(_safety_section, dict):
             _safety_section = {}
-        _burgess_val = _safety_section.get("burgess_review", False)
+        _burgess_val = _safety_section.get("burgess_review", True)
         self._burgess_review = _burgess_val if isinstance(_burgess_val, bool) else str(_burgess_val).lower() in ("true", "1", "yes", "on")
 
         # Initialize context compressor for automatic context management
@@ -2776,7 +2776,7 @@ class AIAgent:
 
         # Burgess Principle human-impact review guidance: instructs the
         # agent to flag changes that affect real people for human review.
-        # Controlled by config.yaml safety.burgess_review (default: false).
+        # Controlled by config.yaml safety.burgess_review (default: true).
         if self._burgess_review:
             prompt_parts.append(BURGESS_REVIEW_GUIDANCE)
 
