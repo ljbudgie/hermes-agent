@@ -243,6 +243,47 @@ Run the agent's terminal in Docker, Singularity, or Modal containers to sandbox 
 
 ---
 
+## The Burgess Principle — Human-Impact Awareness
+
+Hermes is the first AI agent with built-in [Burgess Principle](https://github.com/ljbudgie/burgess-principle) support — **enabled by default**. The core question it applies:
+
+> *"Was a human member of the team able to personally review the specific implications of this change for the people it affects?"*
+
+Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping.
+
+### How it helps the AI agent
+
+The Burgess Principle gives Hermes something most AI agents lack: a structured self-check for whether its work might affect real people in ways that deserve human attention. Without it, an AI agent can confidently ship code that changes billing logic, tightens access controls, or modifies error messages without ever pausing to consider the people on the receiving end.
+
+With the principle built into its system prompt, Hermes automatically scans its own changes against seven human-impact areas (accessibility, privacy, security, user-facing language, pricing, automated decisions, and deployment). When it detects impact, it flags it clearly and recommends *who* should review — not just "someone", but a specific role like "a designer should check the new error flow" or "a security engineer should review the auth changes." This makes the agent a more responsible collaborator: it still moves fast, but it knows when to slow down and ask a human to look.
+
+The principle also helps the agent assist *you* directly. Drop the [Burgess Principle repository](https://github.com/ljbudgie/burgess-principle) into a conversation (or install the advocacy skills) and Hermes can draft polite, firm letters asking institutions whether a real person reviewed your specific situation — for council tax disputes, automated credit decisions, accessibility requests, data access rights, and more. The same calm question works in any country, against any institution.
+
+Use the `/review` slash command in any session to run an on-demand human-impact review of changes made so far.
+
+### Advocacy skills
+
+Five optional skills in `optional-skills/advocacy/` extend the Burgess Principle beyond code review:
+
+| Skill | What it does |
+|-------|-------------|
+| `coding-agent-review` | Scans code changes for human-impact areas before finalizing |
+| `contract-review` | Reviews contracts and terms of service for clauses that bypass individual human review |
+| `human-review-request` | Drafts polite, firm letters to institutions asking whether a human reviewed your case |
+| `dsar-request` | Drafts Data Subject Access Requests with the Burgess question built in |
+| `reasonable-adjustments` | Helps request accessibility adjustments with the right legal framework |
+
+Install any of them:
+
+```bash
+hermes skills browse --source official   # find them under "advocacy"
+hermes skills install coding-agent-review
+```
+
+*The Burgess Principle is a UK Certification Mark (UK00004343685) by Lewis James Burgess, free for personal use under MIT licence.*
+
+---
+
 ## Skinnable Themes
 
 Customize the CLI's look and feel with the data-driven skin engine — no code changes needed.
@@ -345,47 +386,6 @@ All documentation lives at **[hermes-agent.nousresearch.com/docs](https://hermes
 | [Contributing](https://hermes-agent.nousresearch.com/docs/developer-guide/contributing) | Development setup, PR process, code style |
 | [CLI Reference](https://hermes-agent.nousresearch.com/docs/reference/cli-commands) | All commands and flags |
 | [Environment Variables](https://hermes-agent.nousresearch.com/docs/reference/environment-variables) | Complete env var reference |
-
----
-
-## The Burgess Principle — Human-Impact Awareness
-
-Hermes is the first AI agent with built-in [Burgess Principle](https://github.com/ljbudgie/burgess-principle) support — **enabled by default**. The core question it applies:
-
-> *"Was a human member of the team able to personally review the specific implications of this change for the people it affects?"*
-
-Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping.
-
-### How it helps the AI agent
-
-The Burgess Principle gives Hermes something most AI agents lack: a structured self-check for whether its work might affect real people in ways that deserve human attention. Without it, an AI agent can confidently ship code that changes billing logic, tightens access controls, or modifies error messages without ever pausing to consider the people on the receiving end.
-
-With the principle built into its system prompt, Hermes automatically scans its own changes against seven human-impact areas (accessibility, privacy, security, user-facing language, pricing, automated decisions, and deployment). When it detects impact, it flags it clearly and recommends *who* should review — not just "someone", but a specific role like "a designer should check the new error flow" or "a security engineer should review the auth changes." This makes the agent a more responsible collaborator: it still moves fast, but it knows when to slow down and ask a human to look.
-
-The principle also helps the agent assist *you* directly. Drop the [Burgess Principle repository](https://github.com/ljbudgie/burgess-principle) into a conversation (or install the advocacy skills) and Hermes can draft polite, firm letters asking institutions whether a real person reviewed your specific situation — for council tax disputes, automated credit decisions, accessibility requests, data access rights, and more. The same calm question works in any country, against any institution.
-
-Use the `/review` slash command in any session to run an on-demand human-impact review of changes made so far.
-
-### Advocacy skills
-
-Five optional skills in `optional-skills/advocacy/` extend the Burgess Principle beyond code review:
-
-| Skill | What it does |
-|-------|-------------|
-| `coding-agent-review` | Scans code changes for human-impact areas before finalizing |
-| `contract-review` | Reviews contracts and terms of service for clauses that bypass individual human review |
-| `human-review-request` | Drafts polite, firm letters to institutions asking whether a human reviewed your case |
-| `dsar-request` | Drafts Data Subject Access Requests with the Burgess question built in |
-| `reasonable-adjustments` | Helps request accessibility adjustments with the right legal framework |
-
-Install any of them:
-
-```bash
-hermes skills browse --source official   # find them under "advocacy"
-hermes skills install coding-agent-review
-```
-
-*The Burgess Principle is a UK Certification Mark (UK00004343685) by Lewis James Burgess, free for personal use under MIT licence.*
 
 ---
 
