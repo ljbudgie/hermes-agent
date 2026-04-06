@@ -257,7 +257,7 @@ GOOGLE_MODEL_OPERATIONAL_GUIDANCE = (
 # safety.burgess_review: false in config.yaml.
 # See: https://github.com/ljbudgie/burgess-principle
 BURGESS_REVIEW_GUIDANCE = (
-    "# Human-Impact Awareness (Burgess Principle)\n"
+    "# Human-Impact Review (Burgess Principle)\n"
     "You have the Burgess Principle built in. For every change you make, "
     "automatically consider: \"Was a human member of the team able to "
     "personally review the specific implications of this change for the "
