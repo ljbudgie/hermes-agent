@@ -12,6 +12,20 @@ hermes skills search <query>       # finds optional skills labeled "official"
 hermes skills install <identifier> # copies to ~/.hermes/skills/ and activates
 ```
 
+## Categories
+
+### Advocacy (Burgess Principle)
+
+Skills based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle)
+that help users exercise their right to individual human attention from institutions.
+Includes coding agent review, contract review, DSAR requests, human review request
+letters, and reasonable adjustments for disability/accessibility.
+
+### Other categories
+
+Security, DevOps, research, productivity, communication, creative, and more — browse
+with `hermes skills browse` to see everything available.
+
 ## Why optional?
 
 Some skills are useful but not broadly needed by every user:

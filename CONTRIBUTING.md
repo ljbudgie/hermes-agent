@@ -13,8 +13,9 @@ We value contributions in this order:
 3. **Security hardening** — shell injection, prompt injection, path traversal, privilege escalation. See [Security](#security-considerations).
 4. **Performance and robustness** — retry logic, error handling, graceful degradation.
 5. **New skills** — but only broadly useful ones. See [Should it be a Skill or a Tool?](#should-it-be-a-skill-or-a-tool)
-6. **New tools** — rarely needed. Most capabilities should be skills. See below.
-7. **Documentation** — fixes, clarifications, new examples.
+6. **Advocacy & human-impact skills** — skills that help people exercise their rights using the [Burgess Principle](https://github.com/ljbudgie/burgess-principle). See `optional-skills/advocacy/` for examples.
+7. **New tools** — rarely needed. Most capabilities should be skills. See below.
+8. **Documentation** — fixes, clarifications, new examples.
 
 ---
 
@@ -43,7 +44,7 @@ Bundled skills (in `skills/`) ship with every Hermes install. They should be **b
 - Document handling, web research, common dev workflows, system administration
 - Used regularly by a wide range of people
 
-If your skill is official and useful but not universally needed (e.g., a paid service integration, a heavyweight dependency), put it in **`optional-skills/`** — it ships with the repo but isn't activated by default. Users can discover it via `hermes skills browse` (labeled "official") and install it with `hermes skills install` (no third-party warning, builtin trust).
+If your skill is official and useful but not universally needed (e.g., a paid service integration, a heavyweight dependency), put it in **`optional-skills/`** — it ships with the repo but isn't activated by default. Users can discover it via `hermes skills browse` (labeled "official") and install it with `hermes skills install` (no third-party warning, builtin trust). See `optional-skills/advocacy/` for the [Burgess Principle](https://github.com/ljbudgie/burgess-principle) skills as a good example of this pattern.
 
 If your skill is specialized, community-contributed, or niche, it's better suited for a **Skills Hub** — upload it to a skills registry and share it in the [Nous Research Discord](https://discord.gg/NousResearch). Users can install it with `hermes skills install`.
 
