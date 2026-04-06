@@ -1142,7 +1142,8 @@ class AIAgent:
         _safety_section = _agent_cfg.get("safety", {})
         if not isinstance(_safety_section, dict):
             _safety_section = {}
-        self._burgess_review = str(_safety_section.get("burgess_review", False)).lower() in ("true", "1", "yes", "on")
+        _burgess_val = _safety_section.get("burgess_review", False)
+        self._burgess_review = _burgess_val if isinstance(_burgess_val, bool) else str(_burgess_val).lower() in ("true", "1", "yes", "on")
 
         # Initialize context compressor for automatic context management
         # Compresses conversation when approaching model's context limit
