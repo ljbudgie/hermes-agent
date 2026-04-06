@@ -22,6 +22,7 @@ Use any model you want — [Nous Portal](https://portal.nousresearch.com), [Open
 <tr><td><b>Scheduled automations</b></td><td>Built-in cron scheduler with delivery to any platform. Daily reports, nightly backups, weekly audits — all in natural language, running unattended.</td></tr>
 <tr><td><b>Delegates and parallelizes</b></td><td>Spawn isolated subagents for parallel workstreams. Write Python scripts that call tools via RPC, collapsing multi-step pipelines into zero-context-cost turns.</td></tr>
 <tr><td><b>Runs anywhere, not just your laptop</b></td><td>Six terminal backends — local, Docker, SSH, Daytona, Singularity, and Modal. Daytona and Modal offer serverless persistence — your agent's environment hibernates when idle and wakes on demand, costing nearly nothing between sessions. Run it on a $5 VPS or a GPU cluster.</td></tr>
+<tr><td><b>Human-impact awareness</b></td><td>Built-in <a href="https://github.com/ljbudgie/burgess-principle">Burgess Principle</a> integration — the agent flags changes that affect real people (accessibility, privacy, billing, automated decisions) and recommends human review before shipping. Five advocacy skills for contract review, data access requests, and more.</td></tr>
 <tr><td><b>Research-ready</b></td><td>Batch trajectory generation, Atropos RL environments, trajectory compression for training the next generation of tool-calling models.</td></tr>
 </table>
 
@@ -75,6 +76,7 @@ Hermes has two entry points: start the terminal UI with `hermes`, or run the gat
 | Retry or undo the last turn | `/retry`, `/undo` | `/retry`, `/undo` |
 | Compress context / check usage | `/compress`, `/usage`, `/insights [--days N]` | `/compress`, `/usage`, `/insights [days]` |
 | Browse skills | `/skills` or `/<skill-name>` | `/skills` or `/<skill-name>` |
+| Run human-impact review | `/review` | `/review` |
 | Interrupt current work | `Ctrl+C` or send a new message | `/stop` or send a new message |
 | Platform-specific status | `/platforms` | `/status`, `/sethome` |
 
@@ -99,10 +101,53 @@ All documentation lives at **[hermes-agent.nousresearch.com/docs](https://hermes
 | [MCP Integration](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp) | Connect any MCP server for extended capabilities |
 | [Cron Scheduling](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron) | Scheduled tasks with platform delivery |
 | [Context Files](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files) | Project context that shapes every conversation |
+| [Burgess Principle](https://github.com/ljbudgie/burgess-principle) | Human-impact review, advocacy skills, `/review` command |
 | [Architecture](https://hermes-agent.nousresearch.com/docs/developer-guide/architecture) | Project structure, agent loop, key classes |
 | [Contributing](https://hermes-agent.nousresearch.com/docs/developer-guide/contributing) | Development setup, PR process, code style |
 | [CLI Reference](https://hermes-agent.nousresearch.com/docs/reference/cli-commands) | All commands and flags |
 | [Environment Variables](https://hermes-agent.nousresearch.com/docs/reference/environment-variables) | Complete env var reference |
+
+---
+
+## The Burgess Principle — Human-Impact Awareness
+
+Hermes is the first AI agent with built-in [Burgess Principle](https://github.com/ljbudgie/burgess-principle) support. The core question it applies:
+
+> *"Was a human member of the team able to personally review the specific implications of this change for the people it affects?"*
+
+When enabled, Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping.
+
+### Enable it
+
+Add to your `~/.hermes/config.yaml`:
+
+```yaml
+safety:
+  burgess_review: true
+```
+
+Or use the `/review` slash command in any session to run an on-demand human-impact review of changes made so far.
+
+### Advocacy skills
+
+Five optional skills in `optional-skills/advocacy/` extend the Burgess Principle beyond code review:
+
+| Skill | What it does |
+|-------|-------------|
+| `coding-agent-review` | Scans code changes for human-impact areas before finalizing |
+| `contract-review` | Reviews contracts and terms of service for clauses that bypass individual human review |
+| `human-review-request` | Drafts polite, firm letters to institutions asking whether a human reviewed your case |
+| `dsar-request` | Drafts Data Subject Access Requests with the Burgess question built in |
+| `reasonable-adjustments` | Helps request accessibility adjustments with the right legal framework |
+
+Install any of them:
+
+```bash
+hermes skills browse --source official   # find them under "advocacy"
+hermes skills install coding-agent-review
+```
+
+*The Burgess Principle is a UK Certification Mark (UK00004343685) by Lewis James Burgess, free for personal use under MIT licence.*
 
 ---
 
