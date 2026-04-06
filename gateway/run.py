@@ -2103,6 +2103,9 @@ class GatewayRunner:
         if canonical == "usage":
             return await self._handle_usage_command(event)
 
+        if canonical == "review":
+            return await self._handle_review_command(event)
+
         if canonical == "insights":
             return await self._handle_insights_command(event)
 
@@ -3827,6 +3830,28 @@ class GatewayRunner:
         # Let the normal message handler process it
         return await self._handle_message(retry_event)
     
+    async def _handle_review_command(self, event: MessageEvent) -> str:
+        """Handle /review — run a Burgess Principle human-impact review."""
+        review_prompt = (
+            "Please perform a Burgess Principle human-impact review of all "
+            "the changes made in this session so far. For each file you "
+            "modified or created, check whether the changes touch any of "
+            "these areas: accessibility, privacy & personal data, security, "
+            "user-facing language, pricing & billing, automated decisions, "
+            "or deployment & infrastructure. List each affected area with a "
+            "brief explanation of what changed and why a human should review "
+            "it. If no human-impact areas were affected, state that. End with "
+            "a recommendation of who should review the flagged areas before "
+            "shipping."
+        )
+        review_event = MessageEvent(
+            text=review_prompt,
+            message_type=MessageType.TEXT,
+            source=event.source,
+            raw_message=event.raw_message,
+        )
+        return await self._handle_message(review_event)
+
     async def _handle_undo_command(self, event: MessageEvent) -> str:
         """Handle /undo command - remove the last user/assistant exchange."""
         source = event.source

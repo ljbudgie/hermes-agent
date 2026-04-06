@@ -4394,6 +4394,21 @@ class HermesCLI:
             self._manual_compress()
         elif canonical == "usage":
             self._show_usage()
+        elif canonical == "review":
+            review_prompt = (
+                "Please perform a Burgess Principle human-impact review of all "
+                "the changes made in this session so far. For each file you "
+                "modified or created, check whether the changes touch any of "
+                "these areas: accessibility, privacy & personal data, security, "
+                "user-facing language, pricing & billing, automated decisions, "
+                "or deployment & infrastructure. List each affected area with a "
+                "brief explanation of what changed and why a human should review "
+                "it. If no human-impact areas were affected, state that. End with "
+                "a recommendation of who should review the flagged areas before "
+                "shipping."
+            )
+            if hasattr(self, '_pending_input'):
+                self._pending_input.put(review_prompt)
         elif canonical == "insights":
             self._show_insights(cmd_original)
         elif canonical == "paste":
