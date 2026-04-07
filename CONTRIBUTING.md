@@ -204,14 +204,18 @@ hermes-agent/
 
 ```
 User message → AIAgent._run_agent_loop()
-  ├── Build system prompt (prompt_builder.py)
+  ├── Build system prompt (prompt_builder.py) — includes Burgess review guidance
   ├── Build API kwargs (model, messages, tools, reasoning config)
   ├── Call LLM (OpenAI-compatible API)
   ├── If tool_calls in response:
   │     ├── Execute each tool via registry dispatch
+  │     ├── Flag deployment commands (Burgess deployment detection)
   │     ├── Add tool results to conversation
   │     └── Loop back to LLM call
   ├── If text response:
+  │     ├── Burgess active enforcement — if file changes or deployment
+  │     │   commands occurred without a human-impact review section,
+  │     │   inject one more turn requesting it
   │     ├── Persist session to DB
   │     └── Return final_response
   └── Context compression if approaching token limit
@@ -225,6 +229,7 @@ User message → AIAgent._run_agent_loop()
 - **Ephemeral injection**: System prompts and prefill messages are injected at API call time, never persisted to the database or logs.
 - **Provider abstraction**: The agent works with any OpenAI-compatible API. Provider resolution happens at init time (Nous Portal OAuth, OpenRouter API key, or custom endpoint).
 - **Provider routing**: When using OpenRouter, `provider_routing` in config.yaml controls provider selection (sort by throughput/latency/price, allow/ignore specific providers, data retention policies). These are injected as `extra_body.provider` in API requests.
+- **Burgess Principle enforcement**: Human-impact review is built into the agent loop. The system prompt always includes review guidance, and active enforcement auto-injects a review turn when the agent makes file changes or runs deployment commands without flagging human impact. See [Human-Impact Review](#human-impact-review-burgess-principle).
 
 ---
 
@@ -564,6 +569,7 @@ Hermes has terminal access. Security matters.
 |-------|---------------|
 | **Sudo password piping** | Uses `shlex.quote()` to prevent shell injection |
 | **Dangerous command detection** | Regex patterns in `tools/approval.py` with user approval flow |
+| **Burgess enforcement** | Human-impact review for file changes and deployment commands (`run_agent.py`, `tools/approval.py`). See [Human-Impact Review](#human-impact-review-burgess-principle) |
 | **Cron prompt injection** | Scanner in `tools/cronjob_tools.py` blocks instruction-override patterns |
 | **Write deny list** | Protected paths (`~/.ssh/authorized_keys`, `/etc/shadow`) resolved via `os.path.realpath()` to prevent symlink bypass |
 | **Skills guard** | Security scanner for hub-installed skills (`tools/skills_guard.py`) |
@@ -579,6 +585,47 @@ Hermes has terminal access. Security matters.
 - **Test on all platforms** if your change touches file paths, process management, or shell commands
 
 If your PR affects security, note it explicitly in the description.
+
+---
+
+## Human-Impact Review (Burgess Principle)
+
+The [Burgess Principle](https://github.com/ljbudgie/burgess-principle) is a core part of Hermes's AI-native behaviour, not just an optional skill. It ensures that changes affecting real people are flagged for human review before shipping. Contributors should understand how this works because it affects the agent loop, tool execution, system prompts, and testing.
+
+### How it works
+
+The integration has three layers:
+
+| Layer | Location | What it does |
+|-------|----------|--------------|
+| **System prompt guidance** | `agent/prompt_builder.py` (`BURGESS_REVIEW_GUIDANCE`) | Always included in the system prompt. Tells the agent which human-impact areas to watch for (accessibility, privacy, billing, automated decisions, etc.) and to include a "⚠ Human-Impact Review" section when they're affected. |
+| **Active enforcement** | `run_agent.py` (agent loop) | When the agent makes file changes or runs deployment commands but doesn't include a human-impact review section, an extra turn is auto-injected requesting one. Guarded against infinite loops. |
+| **Deployment detection** | `tools/approval.py` (`DEPLOYMENT_PATTERNS`) | Regex patterns detect deployment-sensitive commands (docker push, kubectl apply, terraform apply, npm publish, etc.) and flag them as affecting live infrastructure. These are not blocked — they trigger a notice in the tool result. |
+
+### Configuration
+
+Two settings in `safety` section of `config.yaml` (both enabled by default):
+
+```yaml
+safety:
+  burgess_review: true        # Include human-impact guidance in system prompt
+  burgess_enforcement: active  # "active" | "prompt" | false
+```
+
+- **`active`** (default) — system prompt guidance + auto-injection of review turn when the agent misses human-impact areas
+- **`prompt`** — system prompt guidance only (lightweight, no auto-injection)
+- **`false`** — no enforcement (burgess_review still adds prompt guidance if true)
+
+### The `/review` command
+
+Users can run `/review` at any time to trigger a Burgess Principle human-impact review of the current session's changes.
+
+### When contributing
+
+- **Don't disable Burgess enforcement in tests** unless you are specifically testing the enforcement mechanism itself. The enforcement is designed to be unobtrusive and should not interfere with normal agent operation.
+- **If you add deployment-sensitive commands**, add matching patterns to `DEPLOYMENT_PATTERNS` in `tools/approval.py`.
+- **If your change touches human-impact areas** (accessibility, privacy, billing, automated decisions, user-facing language, security, deployment), mention it in your PR description so reviewers know to pay attention.
+- **Advocacy skills** (`optional-skills/advocacy/`) are a complementary feature — they help end users exercise their rights. See [Contribution Priorities](#contribution-priorities) for guidance on contributing new advocacy skills.
 
 ---
 
@@ -599,7 +646,8 @@ refactor/description   # Code restructuring
 1. **Run tests**: `pytest tests/ -v`
 2. **Test manually**: Run `hermes` and exercise the code path you changed
 3. **Check cross-platform impact**: If you touch file I/O, process management, or terminal handling, consider Windows and macOS
-4. **Keep PRs focused**: One logical change per PR. Don't mix a bug fix with a refactor with a new feature.
+4. **Flag human-impact areas**: If your change touches accessibility, privacy, billing, automated decisions, user-facing language, security, or deployment, note it in the PR description. See [Human-Impact Review](#human-impact-review-burgess-principle)
+5. **Keep PRs focused**: One logical change per PR. Don't mix a bug fix with a refactor with a new feature.
 
 ### PR description
 
@@ -607,6 +655,7 @@ Include:
 - **What** changed and **why**
 - **How to test** it (reproduction steps for bugs, usage examples for features)
 - **What platforms** you tested on
+- **Human-impact areas** affected, if any (accessibility, privacy, billing, etc.)
 - Reference any related issues
 
 ### Commit messages
