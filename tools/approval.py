@@ -124,10 +124,11 @@ DEPLOYMENT_PATTERNS = [
     (r'\bpulumi\s+(up|destroy|import)\b', "Pulumi infrastructure change"),
     (r'\bansible-playbook\b', "Ansible playbook execution"),
     (r'\bgit\s+push\b.*\b(prod|production|main|master|release|deploy)\b', "git push to production branch"),
-    (r'\b(aws|gcloud|az)\s+.*deploy\b', "cloud provider deployment"),
     (r'\baws\s+.*update-function-code\b', "AWS Lambda code update"),
     (r'\bgcloud\s+(run|app|functions)\s+deploy\b', "Google Cloud deployment"),
     (r'\baz\s+(webapp|functionapp)\s+deploy', "Azure deployment"),
+    # Generic cloud deploy catch-all (must be AFTER specific gcloud/az patterns)
+    (r'\b(aws|gcloud|az)\s+.*deploy\b', "cloud provider deployment"),
     (r'\bsystemctl\s+(restart|reload)\b', "system service restart"),
     (r'\bnginx\s+-s\s+reload\b', "nginx reload"),
     (r'\bflyctl\s+deploy\b', "Fly.io deployment"),
