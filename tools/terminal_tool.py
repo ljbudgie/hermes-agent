@@ -139,6 +139,7 @@ def set_approval_callback(cb):
 from tools.approval import (
     check_dangerous_command as _check_dangerous_command_impl,
     check_all_command_guards as _check_all_guards_impl,
+    detect_deployment_command as _detect_deployment_command,
 )
 
 
@@ -1194,6 +1195,20 @@ def terminal_tool(
                 desc = approval.get("description", "flagged as dangerous")
                 approval_note = f"Command was flagged ({desc}) and auto-approved by smart approval."
 
+        # Burgess Principle: detect deployment-sensitive commands and attach a
+        # human-impact notice to the result.  This does NOT block the command —
+        # it annotates the output so the agent (and user) are aware that real
+        # people or live infrastructure may be affected.
+        burgess_deployment_note = None
+        is_deploy, deploy_desc = _detect_deployment_command(command)
+        if is_deploy:
+            burgess_deployment_note = (
+                f"⚠ Burgess Principle — this command ({deploy_desc}) affects live "
+                f"infrastructure or publishes artifacts that real people depend on. "
+                f"Ensure a human has reviewed the specific implications of this "
+                f"change for the people it affects before proceeding."
+            )
+
         # Validate workdir against shell injection
         if workdir:
             workdir_error = _validate_workdir(workdir)
@@ -1245,6 +1260,8 @@ def terminal_tool(
                 }
                 if approval_note:
                     result_data["approval"] = approval_note
+                if burgess_deployment_note:
+                    result_data["burgess_notice"] = burgess_deployment_note
 
                 # Transparent timeout clamping note
                 max_timeout = effective_timeout
@@ -1367,6 +1384,8 @@ def terminal_tool(
             }
             if approval_note:
                 result_dict["approval"] = approval_note
+            if burgess_deployment_note:
+                result_dict["burgess_notice"] = burgess_deployment_note
             if exit_note:
                 result_dict["exit_code_meaning"] = exit_note
 

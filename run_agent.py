@@ -1145,6 +1145,22 @@ class AIAgent:
         _burgess_val = _safety_section.get("burgess_review", True)
         self._burgess_review = _burgess_val if isinstance(_burgess_val, bool) else str(_burgess_val).lower() in ("true", "1", "yes", "on")
 
+        # Burgess enforcement level: "prompt" (guidance only), "active"
+        # (auto-inject review turn), or false/off (disabled).
+        _enforce_val = _safety_section.get("burgess_enforcement", "active")
+        if isinstance(_enforce_val, bool):
+            self._burgess_enforcement = "active" if _enforce_val else "off"
+        else:
+            self._burgess_enforcement = str(_enforce_val).lower().strip()
+            if self._burgess_enforcement in ("false", "0", "no", "off", "none"):
+                self._burgess_enforcement = "off"
+            elif self._burgess_enforcement not in ("prompt", "active"):
+                self._burgess_enforcement = "active"  # default to active
+
+        # Per-turn Burgess tracking: reset at the start of each run_conversation.
+        self._burgess_file_mutations: list = []
+        self._burgess_deployment_commands: list = []
+
         # Initialize context compressor for automatic context management
         # Compresses conversation when approaching model's context limit
         # Configuration via config.yaml (compression section)
@@ -1562,6 +1578,45 @@ class AIAgent:
         content = re.sub(r'<REASONING_SCRATCHPAD>.*?</REASONING_SCRATCHPAD>', '', content, flags=re.DOTALL)
         content = re.sub(r'</?(?:think|thinking|reasoning|REASONING_SCRATCHPAD)>\s*', '', content, flags=re.IGNORECASE)
         return content
+
+    # ── Burgess Principle helpers ──────────────────────────────────────
+
+    def _response_contains_burgess_review(self, response: str) -> bool:
+        """Check whether the final response already contains a human-impact review."""
+        if not response:
+            return False
+        lower = response.lower()
+        return any(marker in lower for marker in (
+            "human-impact review",
+            "human impact review",
+            "burgess principle",
+            "⚠ human-impact",
+            "⚠️ human-impact",
+            "🔍 human-impact",
+        ))
+
+    def _build_burgess_review_prompt(self) -> str:
+        """Build a user-message prompt requesting a Burgess Principle review."""
+        parts = [
+            "[System: Burgess Principle active enforcement — before finalizing, "
+            "you MUST include a Human-Impact Review section. The following "
+            "changes were detected during this turn:\n"
+        ]
+        if self._burgess_file_mutations:
+            parts.append(f"\nFiles modified: {', '.join(self._burgess_file_mutations[:20])}")
+        if self._burgess_deployment_commands:
+            parts.append(f"\nDeployment commands: {', '.join(self._burgess_deployment_commands[:10])}")
+        parts.append(
+            "\n\nPlease add a brief '⚠ Human-Impact Review (Burgess Principle)' "
+            "section to your response. For each file or command above, check "
+            "whether changes touch: accessibility, privacy & personal data, "
+            "security, user-facing language, pricing & billing, automated "
+            "decisions, or deployment & infrastructure. List affected areas "
+            "with one sentence each, and recommend who should review. If no "
+            "human-impact areas were affected, state that briefly. Then "
+            "re-state your original summary/conclusion.]"
+        )
+        return "".join(parts)
 
     def _looks_like_codex_intermediate_ack(
         self,
@@ -6521,6 +6576,23 @@ class AIAgent:
             # Save oversized results to file instead of destructive truncation
             function_result = _save_oversized_tool_result(function_name, function_result)
 
+            # Burgess tracking: record file mutations and deployment commands
+            # so the agent loop can auto-inject a review if needed.
+            if self._burgess_review and self._burgess_enforcement == "active":
+                if function_name in ("write_file", "patch", "create_file"):
+                    _bp_path = function_args.get("path", "")
+                    if _bp_path and _bp_path not in self._burgess_file_mutations:
+                        self._burgess_file_mutations.append(_bp_path)
+                elif function_name == "terminal":
+                    try:
+                        _bp_result = json.loads(function_result) if isinstance(function_result, str) else {}
+                        if isinstance(_bp_result, dict) and _bp_result.get("burgess_notice"):
+                            _bp_cmd = function_args.get("command", "")[:120]
+                            if _bp_cmd not in self._burgess_deployment_commands:
+                                self._burgess_deployment_commands.append(_bp_cmd)
+                    except (json.JSONDecodeError, TypeError):
+                        pass
+
             # Discover subdirectory context files from tool arguments
             subdir_hints = self._subdirectory_hints.check_tool_call(function_name, function_args)
             if subdir_hints:
@@ -6854,6 +6926,11 @@ class AIAgent:
         self._last_content_with_tools = None
         self._mute_post_response = False
         self._surrogate_sanitized = False
+
+        # Reset Burgess Principle per-turn tracking
+        self._burgess_file_mutations = []
+        self._burgess_deployment_commands = []
+        self._burgess_injected = False
 
         # Pre-turn connection health check: detect and clean up dead TCP
         # connections left over from provider outages or dropped streams.
@@ -8888,6 +8965,34 @@ class AIAgent:
                     final_msg = self._build_assistant_message(assistant_message, finish_reason)
                     
                     messages.append(final_msg)
+
+                    # Burgess Principle active enforcement: if the agent made
+                    # file changes or ran deployment commands during this turn
+                    # but the final response doesn't contain a human-impact
+                    # review section, inject one more turn requesting it.
+                    # Only fires once per turn (guard via _burgess_injected).
+                    if (
+                        self._burgess_review
+                        and self._burgess_enforcement == "active"
+                        and not getattr(self, "_burgess_injected", False)
+                        and (self._burgess_file_mutations or self._burgess_deployment_commands)
+                        and not self._response_contains_burgess_review(final_response)
+                        and api_call_count < self.max_iterations - 1
+                    ):
+                        self._burgess_injected = True
+                        burgess_prompt = self._build_burgess_review_prompt()
+                        messages.append({"role": "user", "content": burgess_prompt})
+                        self._session_messages = messages
+                        self._save_session_log(messages)
+                        if not self.quiet_mode:
+                            self._safe_print(
+                                f"{self.log_prefix}🔍 Burgess Principle: requesting "
+                                f"human-impact review of changes..."
+                            )
+                        # Don't break — continue the loop so the model produces
+                        # the review as its next (and final) response.
+                        final_response = None
+                        continue
                     
                     if not self.quiet_mode:
                         self._safe_print(f"🎉 Conversation completed after {api_call_count} OpenAI-compatible API call(s)")
