@@ -551,10 +551,10 @@ DEFAULT_CONFIG = {
     # for human review before finalizing.  Set to false to disable.
     #
     # burgess_enforcement controls structural enforcement:
-    #   "prompt" — system prompt guidance only (default, lightweight)
-    #   "active" — auto-injects a Burgess review turn when the agent made
-    #              file changes or ran deployment commands but didn't include
-    #              a human-impact review section in its final response
+    #   "active" — (default) auto-injects a Burgess review turn when the
+    #              agent made file changes or ran deployment commands but
+    #              didn't include a human-impact review section in its response
+    #   "prompt" — system prompt guidance only (lightweight, no auto-injection)
     #   false    — no enforcement (burgess_review still adds prompt guidance)
     # See: https://github.com/ljbudgie/burgess-principle
     "safety": {

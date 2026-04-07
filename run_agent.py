@@ -6578,6 +6578,8 @@ class AIAgent:
 
             # Burgess tracking: record file mutations and deployment commands
             # so the agent loop can auto-inject a review if needed.
+            # Dedup by path/command — we only need to know *which* files were
+            # touched, not how many times each was modified.
             if self._burgess_review and self._burgess_enforcement == "active":
                 if function_name in ("write_file", "patch", "create_file"):
                     _bp_path = function_args.get("path", "")
@@ -8970,7 +8972,12 @@ class AIAgent:
                     # file changes or ran deployment commands during this turn
                     # but the final response doesn't contain a human-impact
                     # review section, inject one more turn requesting it.
-                    # Only fires once per turn (guard via _burgess_injected).
+                    # Guards against infinite loops:
+                    #   1. _burgess_injected=True prevents a second injection
+                    #   2. api_call_count is incremented at the top of the while
+                    #      loop, so this review turn counts toward max_iterations
+                    #   3. The api_call_count < max_iterations - 1 check ensures
+                    #      we have budget for at least one more API call
                     if (
                         self._burgess_review
                         and self._burgess_enforcement == "active"
