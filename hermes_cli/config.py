@@ -549,13 +549,21 @@ DEFAULT_CONFIG = {
     # Enabled by default — the agent always flags changes that affect real
     # people (accessibility, privacy, billing, automated decisions, etc.)
     # for human review before finalizing.  Set to false to disable.
+    #
+    # burgess_enforcement controls structural enforcement:
+    #   "active" — (default) auto-injects a Burgess review turn when the
+    #              agent made file changes or ran deployment commands but
+    #              didn't include a human-impact review section in its response
+    #   "prompt" — system prompt guidance only (lightweight, no auto-injection)
+    #   false    — no enforcement (burgess_review still adds prompt guidance)
     # See: https://github.com/ljbudgie/burgess-principle
     "safety": {
         "burgess_review": True,
+        "burgess_enforcement": "active",
     },
 
     # Config schema version - bump this when adding new required fields
-    "_config_version": 14,
+    "_config_version": 15,
 }
 
 # =============================================================================
@@ -1657,6 +1665,22 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
             results["config_added"].append("safety.burgess_review=true")
             if not quiet:
                 print("  ✓ Enabled Burgess Principle human-impact review (safety.burgess_review: true)")
+
+    # ── Version 14 → 15: add active Burgess enforcement ───────────────
+    if current_ver < 15:
+        config = load_config()
+        safety = config.get("safety", {})
+        if not isinstance(safety, dict):
+            safety = {}
+        if "burgess_enforcement" not in safety:
+            safety["burgess_enforcement"] = "active"
+            config["safety"] = safety
+            save_config(config)
+            results["config_added"].append("safety.burgess_enforcement=active")
+            if not quiet:
+                print("  ✓ Enabled active Burgess enforcement (safety.burgess_enforcement: active)")
+                print("    The agent will auto-inject a human-impact review when changes")
+                print("    affect files or deployments.  Set to \"prompt\" for guidance-only.")
 
     if current_ver < latest_ver and not quiet:
         print(f"Config version: {current_ver} → {latest_ver}")

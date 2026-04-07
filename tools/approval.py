@@ -105,6 +105,58 @@ DANGEROUS_PATTERNS = [
     (r'\bsed\s+--in-place\b.*\s/etc/', "in-place edit of system config (long flag)"),
 ]
 
+# =========================================================================
+# Deployment-sensitive command patterns (Burgess Principle)
+# =========================================================================
+# Commands that push changes to production or affect live infrastructure.
+# These are NOT blocked by default — they trigger a Burgess human-impact
+# notice in the tool result when safety.burgess_review is enabled,
+# reminding the agent (and user) that real people may be affected.
+
+DEPLOYMENT_PATTERNS = [
+    (r'\bdocker\s+push\b', "container image push to registry"),
+    (r'\bpodman\s+push\b', "container image push to registry"),
+    (r'\bkubectl\s+(apply|delete|rollout|scale|set|patch|replace)\b', "Kubernetes cluster change"),
+    (r'\bkubectl\s+exec\b', "command execution in live Kubernetes pod"),
+    (r'\bhelm\s+(install|upgrade|uninstall|rollback)\b', "Helm chart deployment"),
+    (r'\bterraform\s+(apply|destroy|import)\b', "Terraform infrastructure change"),
+    (r'\btofu\s+(apply|destroy|import)\b', "OpenTofu infrastructure change"),
+    (r'\bpulumi\s+(up|destroy|import)\b', "Pulumi infrastructure change"),
+    (r'\bansible-playbook\b', "Ansible playbook execution"),
+    (r'\bgit\s+push\b.*\b(prod|production|main|master|release|deploy)\b', "git push to production branch"),
+    (r'\baws\s+.*update-function-code\b', "AWS Lambda code update"),
+    (r'\bgcloud\s+(run|app|functions)\s+deploy\b', "Google Cloud deployment"),
+    (r'\baz\s+(webapp|functionapp)\s+deploy', "Azure deployment"),
+    # Generic cloud deploy catch-all (must be AFTER specific gcloud/az patterns)
+    (r'\b(aws|gcloud|az)\s+.*deploy\b', "cloud provider deployment"),
+    (r'\bsystemctl\s+(restart|reload)\b', "system service restart"),
+    (r'\bnginx\s+-s\s+reload\b', "nginx reload"),
+    (r'\bflyctl\s+deploy\b', "Fly.io deployment"),
+    (r'\brailway\s+(up|deploy)\b', "Railway deployment"),
+    (r'\bvercel\s+(deploy|--prod)\b', "Vercel deployment"),
+    (r'\bnpm\s+publish\b', "npm package publish"),
+    (r'\bpip\s+.*upload\b', "Python package upload"),
+    (r'\bcargo\s+publish\b', "Rust crate publish"),
+    (r'\bgem\s+push\b', "Ruby gem publish"),
+]
+
+
+def detect_deployment_command(command: str) -> tuple:
+    """Check if a command matches deployment-sensitive patterns.
+
+    Unlike dangerous commands, deployment commands are not blocked — they
+    return a Burgess Principle notice that the agent includes in its response
+    to flag that real people may be affected by the change.
+
+    Returns:
+        (is_deployment, description) or (False, None)
+    """
+    command_lower = _normalize_command_for_detection(command).lower()
+    for pattern, description in DEPLOYMENT_PATTERNS:
+        if re.search(pattern, command_lower, re.IGNORECASE | re.DOTALL):
+            return (True, description)
+    return (False, None)
+
 
 def _legacy_pattern_key(pattern: str) -> str:
     """Reproduce the old regex-derived approval key for backwards compatibility."""
