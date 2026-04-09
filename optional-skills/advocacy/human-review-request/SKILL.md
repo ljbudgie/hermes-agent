@@ -8,7 +8,7 @@ description: >
   whether a real person reviewed the specific facts of their case. Based on the
   Burgess Principle.
 version: 1.0.0
-author: ljbudgie
+author: Hermes Agent
 license: MIT
 category: advocacy
 metadata:
@@ -77,5 +77,5 @@ This skill works across all domains:
 
 ## Attribution
 
-Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle) by Lewis James Burgess.
+Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle).
 UK Certification Mark: UK00004343685. Free for personal use under MIT licence.

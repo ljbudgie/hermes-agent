@@ -7,7 +7,7 @@ description: >
   human review. Highlights areas where the user should seek human attention
   before signing.
 version: 1.0.0
-author: ljbudgie
+author: Hermes Agent
 license: MIT
 category: advocacy
 metadata:
@@ -77,5 +77,5 @@ Review contracts and terms of service to identify clauses where the user's right
 
 ## Attribution
 
-Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle) by Lewis James Burgess.
+Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle).
 UK Certification Mark: UK00004343685. Free for personal use under MIT licence.

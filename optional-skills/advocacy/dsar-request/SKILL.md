@@ -6,7 +6,7 @@ description: >
   whether a human reviewed their specific case. Covers GDPR (UK/EU), CCPA (US),
   Privacy Act (Australia/Canada), and equivalent frameworks worldwide.
 version: 1.0.0
-author: ljbudgie
+author: Hermes Agent
 license: MIT
 category: advocacy
 metadata:
@@ -70,5 +70,5 @@ Help users exercise their right to access personal data held by any organisation
 
 ## Attribution
 
-Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle) by Lewis James Burgess.
+Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle).
 UK Certification Mark: UK00004343685. Free for personal use under MIT licence.

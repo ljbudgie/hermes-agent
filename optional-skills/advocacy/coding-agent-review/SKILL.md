@@ -8,7 +8,7 @@ description: >
   Principle: "Was a human member of the team able to personally review the
   specific facts of my situation?"
 version: 1.0.0
-author: ljbudgie
+author: Hermes Agent
 license: MIT
 category: advocacy
 metadata:
@@ -82,5 +82,5 @@ No human-impact areas were affected by these changes. ✅
 
 ## Attribution
 
-Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle) by Lewis James Burgess.
+Based on the [Burgess Principle](https://github.com/ljbudgie/burgess-principle).
 UK Certification Mark: UK00004343685. Free for personal use under MIT licence.

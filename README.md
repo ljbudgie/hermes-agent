@@ -280,7 +280,7 @@ hermes skills browse --source official   # find them under "advocacy"
 hermes skills install coding-agent-review
 ```
 
-*The Burgess Principle is a UK Certification Mark (UK00004343685) by Lewis James Burgess, free for personal use under MIT licence.*
+*The Burgess Principle is a UK Certification Mark (UK00004343685), free for personal use under MIT licence.*
 
 ---
 
