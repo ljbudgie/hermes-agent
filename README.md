@@ -13,19 +13,22 @@
 
 **The self-improving AI agent built by [Nous Research](https://nousresearch.com).** It's the only agent with a built-in learning loop — it creates skills from experience, improves them during use, nudges itself to persist knowledge, searches its own past conversations, and builds a deepening model of who you are across sessions. Run it on a $5 VPS, a GPU cluster, or serverless infrastructure that costs nearly nothing when idle. It's not tied to your laptop — talk to it from Telegram while it works on a cloud VM.
 
-Use any model you want — 18 providers out of the box including [Nous Portal](https://portal.nousresearch.com) (400+ models), [OpenRouter](https://openrouter.ai), Anthropic, OpenAI, Google Gemini, DeepSeek, [Hugging Face](https://huggingface.co), [z.ai/GLM](https://z.ai), [Kimi](https://platform.moonshot.ai), [MiniMax](https://www.minimax.io), Alibaba DashScope, and more. Configure multiple API keys per provider with automatic rotation, or set up ordered fallback chains across providers. Switch with `hermes model` — no code changes, no lock-in.
+Use any model you want — 22 providers out of the box including [Nous Portal](https://portal.nousresearch.com) (400+ models), [OpenRouter](https://openrouter.ai), Anthropic, OpenAI, Google Gemini, DeepSeek, xAI (Grok), Xiaomi MiMo, [Hugging Face](https://huggingface.co), [z.ai/GLM](https://z.ai), [Kimi](https://platform.moonshot.ai), [MiniMax](https://www.minimax.io), Alibaba DashScope, and more. Configure multiple API keys per provider with automatic rotation, or set up ordered fallback chains across providers. Switch with `hermes model` — no code changes, no lock-in.
 
 <table>
 <tr><td><b>A real terminal interface</b></td><td>Full TUI with multiline editing, slash-command autocomplete, conversation history, interrupt-and-redirect, streaming tool output, inline diff previews, and <a href="#skinnable-themes">customizable themes</a>.</td></tr>
-<tr><td><b>Lives where you do</b></td><td><a href="#platform-support">15 messaging platforms</a> — Telegram, Discord, Slack, WhatsApp, Signal, Matrix, Feishu/Lark, WeCom, DingTalk, Mattermost, Email, SMS, Home Assistant, webhooks, and an OpenAI-compatible API server. Voice memo transcription, cross-platform conversation continuity.</td></tr>
+<tr><td><b>Lives where you do</b></td><td><a href="#platform-support">16 messaging platforms</a> — Telegram, Discord, Slack, WhatsApp, iMessage, WeChat, Signal, Matrix, Feishu/Lark, WeCom, DingTalk, Mattermost, Email, SMS, Home Assistant, webhooks, and an OpenAI-compatible API server. Voice memo transcription, cross-platform conversation continuity.</td></tr>
 <tr><td><b>Profiles</b></td><td><a href="#profiles--multi-instance">Fully isolated agent instances</a> — each with its own config, memory, sessions, skills, and gateway. Run a coding assistant, a research agent, and a devops bot side-by-side without interference.</td></tr>
 <tr><td><b>Pluggable memory</b></td><td>A closed learning loop with a <a href="#pluggable-memory-system">pluggable provider interface</a>. Built-in memory (MEMORY.md, USER.md, FTS5 session search) is always on. Add <a href="https://github.com/plastic-labs/honcho">Honcho</a>, Mem0, Holographic, or any third-party backend as a plugin — one active at a time, alongside the built-in layer. Compatible with the <a href="https://agentskills.io">agentskills.io</a> skill standard.</td></tr>
 <tr><td><b>MCP — both ways</b></td><td>Connect any MCP server to extend the agent's tools. Or run <code>hermes mcp serve</code> to <a href="#mcp-server-mode">expose Hermes as an MCP server</a> for Claude Desktop, Cursor, VS Code, and other MCP clients. Editor integrations (ACP) can also register their own MCP servers as agent tools.</td></tr>
-<tr><td><b>Scheduled automations</b></td><td>Built-in cron scheduler with delivery to any of the 15 platforms. Daily reports, nightly backups, weekly audits — all in natural language, running unattended.</td></tr>
+<tr><td><b>Scheduled automations</b></td><td>Built-in cron scheduler with delivery to any of the 16 platforms. Daily reports, nightly backups, weekly audits — all in natural language, running unattended.</td></tr>
 <tr><td><b>Delegates and parallelizes</b></td><td>Spawn isolated subagents for parallel workstreams. Write Python scripts that call tools via RPC, collapsing multi-step pipelines into zero-context-cost turns.</td></tr>
 <tr><td><b>Runs anywhere, not just your laptop</b></td><td>Seven terminal backends — local, <a href="#docker">Docker</a>, SSH, Daytona, Singularity, Modal, and Managed Modal. Daytona and Modal offer serverless persistence — your agent's environment hibernates when idle and wakes on demand.</td></tr>
+<tr><td><b>Web dashboard</b></td><td>A browser-based dashboard (<code>hermes dashboard</code>) for managing config, API keys, sessions, skills, cron jobs, and logs — without touching config files or the terminal.</td></tr>
+<tr><td><b>Fast mode</b></td><td>Toggle <code>/fast</code> for priority processing on OpenAI and Anthropic — lower latency on supported models (GPT-5.4, Codex, Claude).</td></tr>
+<tr><td><b>Backup &amp; restore</b></td><td><code>hermes backup</code> and <code>hermes import</code> — full backup and restore of config, sessions, skills, and memory. Migrate between machines or snapshot before major changes.</td></tr>
 <tr><td><b>Security in depth</b></td><td>Pattern-based <a href="#security">command approval</a> with smart auxiliary-model review. Secret exfiltration blocking — scans tool outputs, browser URLs, and LLM responses for leaked credentials. Container isolation. DM pairing. Credential directory protection.</td></tr>
-<tr><td><b>Human-impact awareness</b></td><td>Built-in <a href="#the-burgess-principle--human-impact-awareness">Burgess Principle</a> integration — enabled by default. The agent flags changes that affect real people (accessibility, privacy, billing, automated decisions) and recommends human review before shipping. Five advocacy skills for contract review, data access requests, and more.</td></tr>
+<tr><td><b>Human-impact awareness</b></td><td>Built-in <a href="#the-burgess-principle--human-impact-awareness">Burgess Principle</a> with structural enforcement — enabled by default. The agent auto-injects a human-impact review when changes affect real people (accessibility, privacy, billing, automated decisions). Five advocacy skills for contract review, data access requests, and more.</td></tr>
 <tr><td><b>Research-ready</b></td><td>Batch trajectory generation, Atropos RL environments, trajectory compression for training the next generation of tool-calling models.</td></tr>
 </table>
 
@@ -71,8 +74,10 @@ hermes              # Interactive CLI — start a conversation
 hermes model        # Choose your LLM provider and model
 hermes tools        # Configure which tools are enabled
 hermes skills       # Browse and manage skills
+hermes dashboard    # Open the web UI dashboard
 hermes config set   # Set individual config values
 hermes gateway      # Start the messaging gateway
+hermes backup       # Back up config, sessions, skills, and memory
 hermes setup        # Run the full setup wizard (configures everything at once)
 hermes -p work ...  # Run any command under a named profile
 hermes doctor       # Diagnose any issues
@@ -85,7 +90,7 @@ hermes update       # Update to the latest version
 
 ## Platform Support
 
-Hermes runs as a CLI and connects to 15 messaging platforms through a single gateway process. Set up any combination with `hermes gateway setup`.
+Hermes runs as a CLI and connects to 16 messaging platforms through a single gateway process. Set up any combination with `hermes gateway setup`.
 
 | Platform | Highlights |
 |----------|-----------|
@@ -93,6 +98,8 @@ Hermes runs as a CLI and connects to 15 messaging platforms through a single gat
 | **Discord** | Voice channels with Opus codec. Thread support. Slash commands. |
 | **Slack** | Multi-workspace via comma-separated tokens. Socket Mode. `/hermes` slash commands. File/image/audio attachments. |
 | **WhatsApp** | Business API, whatsapp-web.js, or Baileys backends. Media attachments and status updates. |
+| **iMessage** | BlueBubbles integration with auto-webhook registration. |
+| **WeChat (Weixin)** | Native support via iLink Bot API with streaming, media uploads, and markdown links. |
 | **Signal** | End-to-end encrypted messaging via signal-cli. |
 | **Matrix** | Room/space support. Thread support. Optional end-to-end encryption via matrix-nio. |
 | **Feishu / Lark** | Enterprise messaging with event subscriptions, message cards, rich formatting, and group chat. |
@@ -109,7 +116,7 @@ Hermes runs as a CLI and connects to 15 messaging platforms through a single gat
 
 ## LLM Providers
 
-Eighteen providers are supported out of the box. Switch at any time with `hermes model` or the `/model` slash command.
+Twenty-two providers are supported out of the box. Switch at any time with `hermes model` or the `/model` slash command.
 
 | Provider | Notes |
 |----------|-------|
@@ -120,11 +127,15 @@ Eighteen providers are supported out of the box. Switch at any time with `hermes
 | [OpenAI Codex](https://openai.com) | Codex models via OAuth device flow |
 | [Google Gemini](https://ai.google.dev) | Gemini family via AI Studio |
 | [DeepSeek](https://deepseek.com) | DeepSeek models |
+| [xAI](https://x.ai) | Grok models with direct API access |
+| [Xiaomi MiMo](https://xiaomi.com) | MiMo models |
 | [Hugging Face](https://huggingface.co) | Inference API with live endpoint probing |
 | [z.ai / GLM](https://z.ai) | GLM models |
 | [Kimi / Moonshot](https://platform.moonshot.ai) | Kimi and Moonshot models |
+| [Kimi / Moonshot (China)](https://platform.moonshot.ai) | Mainland China endpoint |
 | [MiniMax](https://www.minimax.io) | MiniMax models (global and China endpoints) |
 | [Alibaba DashScope](https://dashscope.aliyun.com) | Qwen family |
+| [Qwen OAuth](https://dashscope.aliyun.com) | Qwen models via portal request |
 | [GitHub Copilot](https://github.com/features/copilot) | Via API key or ACP adapter |
 | OpenCode Zen / Go | Community model endpoints |
 | AI Gateway | Custom gateway routing |
@@ -247,11 +258,11 @@ Run the agent's terminal in Docker, Singularity, or Modal containers to sandbox 
 
 ## The Burgess Principle — Human-Impact Awareness
 
-Hermes is the first AI agent with built-in [Burgess Principle](https://github.com/ljbudgie/burgess-principle) support — **enabled by default**. The core question it applies:
+Hermes is the first AI agent with built-in [Burgess Principle](https://github.com/ljbudgie/burgess-principle) support — **enabled by default with structural enforcement**. The core question it applies:
 
 > *"Was a human member of the team able to personally review the specific implications of this change for the people it affects?"*
 
-Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping.
+Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping. With structural enforcement (`safety.burgess_enforcement: active`), the agent auto-injects a human-impact review turn when it makes file changes or runs deployment commands without including a review section.
 
 ### How it helps the AI agent
 
@@ -316,18 +327,20 @@ Skins customize banner colors, spinner animations, tool output prefixes, per-too
 
 ## CLI vs Messaging Quick Reference
 
-Hermes has two entry points: start the terminal UI with `hermes`, or run the gateway and talk to it from any of the 15 supported platforms. Once you're in a conversation, many slash commands are shared across both interfaces.
+Hermes has two entry points: start the terminal UI with `hermes`, or run the gateway and talk to it from any of the 16 supported platforms. Once you're in a conversation, many slash commands are shared across both interfaces.
 
 | Action | CLI | Messaging platforms |
 |---------|-----|---------------------|
 | Start chatting | `hermes` | Run `hermes gateway setup` + `hermes gateway start`, then send the bot a message |
 | Start fresh conversation | `/new` or `/reset` | `/new` or `/reset` |
 | Change model | `/model [provider:model]` | `/model [provider:model]` |
+| Toggle fast mode | `/fast` | `/fast` |
 | Set a personality | `/personality [name]` | `/personality [name]` |
 | Retry or undo the last turn | `/retry`, `/undo` | `/retry`, `/undo` |
 | Compress context / check usage | `/compress`, `/usage`, `/insights [--days N]` | `/compress`, `/usage`, `/insights [days]` |
 | Browse skills | `/skills` or `/<skill-name>` | `/skills` or `/<skill-name>` |
 | Run human-impact review | `/review` | `/review` |
+| Debug diagnostics | `/debug` | `/debug` |
 | Switch skin/theme | `/skin [name]` | — |
 | Interrupt current work | `Ctrl+C` or send a new message | `/stop` or send a new message |
 | Platform-specific status | `/platforms` | `/status`, `/sethome` |
@@ -374,13 +387,14 @@ All documentation lives at **[hermes-agent.nousresearch.com/docs](https://hermes
 | [Quickstart](https://hermes-agent.nousresearch.com/docs/getting-started/quickstart) | Install → setup → first conversation in 2 minutes |
 | [CLI Usage](https://hermes-agent.nousresearch.com/docs/user-guide/cli) | Commands, keybindings, personalities, sessions, skins |
 | [Configuration](https://hermes-agent.nousresearch.com/docs/user-guide/configuration) | Config file, providers, credential pools, fallback chains, all options |
-| [Messaging Gateway](https://hermes-agent.nousresearch.com/docs/user-guide/messaging) | All 15 platforms — setup, webhook modes, group controls, multi-workspace |
+| [Messaging Gateway](https://hermes-agent.nousresearch.com/docs/user-guide/messaging) | All 16 platforms — setup, webhook modes, group controls, multi-workspace |
 | [Security](https://hermes-agent.nousresearch.com/docs/user-guide/security) | Command approval, secret exfiltration blocking, DM pairing, container isolation |
 | [Tools & Toolsets](https://hermes-agent.nousresearch.com/docs/user-guide/features/tools) | 40+ tools, toolset system, terminal backends, Camofox browser |
 | [Skills System](https://hermes-agent.nousresearch.com/docs/user-guide/features/skills) | Procedural memory, Skills Hub, creating and installing skills |
 | [Memory](https://hermes-agent.nousresearch.com/docs/user-guide/features/memory) | Pluggable memory providers, built-in memory, user profiles |
 | [Profiles](https://hermes-agent.nousresearch.com/docs/user-guide/features/profiles) | Multi-instance support, profile creation, isolation |
 | [MCP Integration](https://hermes-agent.nousresearch.com/docs/user-guide/features/mcp) | Connect MCP servers, run Hermes as an MCP server, ACP editor integration |
+| [Web Dashboard](https://hermes-agent.nousresearch.com/docs/user-guide/features/web-dashboard) | Browser-based dashboard for config, API keys, sessions, skills, cron, and logs |
 | [Cron Scheduling](https://hermes-agent.nousresearch.com/docs/user-guide/features/cron) | Scheduled tasks with delivery to any platform |
 | [Context Files](https://hermes-agent.nousresearch.com/docs/user-guide/features/context-files) | SOUL.md, AGENTS.md, .cursorrules — project context that shapes every conversation |
 | [Burgess Principle](https://github.com/ljbudgie/burgess-principle) | Human-impact review, advocacy skills, `/review` command |
