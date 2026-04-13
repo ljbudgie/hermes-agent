@@ -262,7 +262,7 @@ Hermes is the first AI agent with built-in [Burgess Principle](https://github.co
 
 > *"Was a human member of the team able to personally review the specific implications of this change for the people it affects?"*
 
-Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping. With structural enforcement (`safety.burgess_enforcement: active`), the agent auto-injects a human-impact review turn when it makes file changes or runs deployment commands without including a review section.
+Hermes automatically flags changes that touch accessibility, privacy, personal data, security, user-facing language, pricing, automated decisions, or deployment — and recommends who should review them before shipping. With structural enforcement (`safety.burgess_enforcement: active`), the agent automatically adds a human-impact review step when it makes file changes or runs deployment commands — ensuring these areas are explicitly considered before finalizing.
 
 ### How it helps the AI agent
 
